@@ -1,0 +1,51 @@
+---
+title: "Untitled"
+author: "Zachary M. Smith"
+date: "April 17, 2018"
+output: html_document
+---
+
+# Introduction
+
+This document was created using R-Notebook, which aids in creating 
+descriptive, reproducible analyses.
+
+## The tidyverse
+
+The packages `dplyr` and `tidyr` are used throughout this analysis. These packages
+are from the `tidyverse`, which uses a slightly different syntax than base R. 
+The `tidyverse` syntax is intended to reduce typing and to produce more readable
+code. Although the syntax takes some time to learn, I find these packages
+to be very helpful for manipulating data. Whenever I use these functions in this
+document I have tried specify the package that they come from by adding the prefix
+`dplyr::` or `tidyr::`. The prefix is not necessary if you load the package using
+`library()` but I thought it might help to clarify which package the function
+is derived from. 
+
+The `tidyverse` syntax is referred to as Non-Standard Evaluation (NSE). NSE 
+allows the user to refer to columns by name without specifying the
+data frame for each column and without having to quote the column name.
+For example, imagine you want to keep all rows from your data frame,
+`df`, where `col.x == TRUE`. In base R, you could write `df[df$col.x == TRUE, ]`
+to filter your data frame. The `dplyr` function, `filter`, is more descriptive 
+of the action you want to perform and only requires the user to specify the
+data frame once. To perform the same filter as above with `dplyr`, 
+you would write `filter(df, col.x == TRUE)`. Another useful function from 
+`dplyr` is `select`. Imagine `df` has 26 columns and you only want to keep
+columns `col.x`, `col.y`, and `col.z`. In base R, you could write 
+`df[, c("col.x", "col.y", "col.z")]`. To perform the same action with `dlyr` 
+you would use `select(df, col.x, col.y, col.z)`. The `dplyr` function are 
+more descriptive and generally require less typing.
+
+Another useful feature of the `tidyverse` is the `magrittr` pipe function, `%>%`. 
+The pipe allows the user to chain multiple functions together. The example provided
+by Wickham and Grolemund (2016) is `x %>% f(y)` is equivalent to `f(x, y)`. 
+Wickham and Grolemund (2016) also suggest reading `%>%` as "then". The following
+example would be read as specify `df` as your data frame, then select columns 
+`col.x`, `col.y`, and `col.z`, and then filter rows so that `col.x == TRUE`.
+
+```{r eval=FALSE}
+df %>% 
+select(col.x, col.y, col.z) %>% 
+filter(col.x == TRUE)
+```

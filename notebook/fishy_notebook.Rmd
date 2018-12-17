@@ -1,0 +1,39 @@
+---
+title: "Fishy"
+author: "Zachary M. Smith"
+date: "December 16, 2017"
+output: html_document
+---
+
+`r Sys.Date()`
+
+
+```{r, echo=FALSE}
+evaluate <- TRUE
+```
+
+# Introduction
+```{r child = 'introduction.Rmd', eval=TRUE}
+
+```
+
+# Taxonomic Data
+```{r child = 'taxa_data.Rmd', eval=TRUE}
+
+```
+
+# Station Data
+```{r child = 'station_data.Rmd', eval=TRUE}
+
+```
+
+# Metric Calculations
+```{r child = 'metric_calculation.Rmd', eval=TRUE}
+
+```
+
+# Metric Sensitivity
+```{r child = 'metric_sensitivity.Rmd', eval=TRUE}
+
+```
+

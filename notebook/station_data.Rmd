@@ -1,0 +1,115 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Station Data
+
+### Import
+
+The station and environmental data is imported and all of the names are 
+converted to lower case.
+```{r}
+env.df <- file.path(rprojroot::find_rstudio_root_file(),
+                             "data/historicalenvdata_final.csv") %>% 
+  data.table::fread(data.table = FALSE) %>% 
+  dplyr::rename_all(tolower)
+```
+
+### Disturbance  (HELP)
+
+A disturbance gradient was created with specific conductance (`conduct`), 
+the percentage of forested land in the watershed delineated above the sampling
+site (`pct_forest`), and the percentage of developed land in the watershed 
+delineated above the sampling site (`pct_developed`). If `conduct` was less than 
+or equal to 250 microsiemens __and__ `pct_forest` was greater than or equal to 75%, 
+then the site was classified as "reference". If `conduct` was greater than or 
+equal to 800 microsiemens __or__ `pct_developed` was greater than or equal to 
+25%, then the site was classified as "degraded". Any sites that did not meet these 
+specifications were classified as "moderately degraded".
+
+I think these specification need to be updated but I want to get some consensus from the group.
+```{r}
+env.df <- env.df %>% 
+  mutate(gradient = case_when(
+    conduct <= 250 & pct_forest >= 75  ~ "reference",
+    conduct >= 800 | pct_developed >= 25 ~ "degraded",
+    TRUE ~ "moderately degraded"
+  ))
+table(env.df$gradient)
+```
+
+### Join Disturbance Gradient with Taxonomic Data
+
+The `env.df` was subset to only include columns `site`, 
+`gradient`, `orig_ibiclassdrainage`, and `ibi_class`. 
+`orig_ibiclassdrainage` was renamed to `drainage_size` and 
+`ibi_class` was renamed to `basin`.
+
+The subset environmental data, `env.sub`, is joined with the taxonomic 
+count data by `site`.
+```{r}
+env.sub <- env.df %>% 
+  dplyr::select(site, gradient, orig_ibiclassdrainage, ibi_class) %>% 
+  dplyr::rename(drainage_size = ibi_class,
+                basin = orig_ibiclassdrainage)
+
+fish.long <- dplyr::left_join(fish.long, env.sub, by = "site")
+```
+
+
+```{r}
+gl.habitat <- file.path(rprojroot::find_rstudio_root_file(),
+                             "data/2014/IBI_2014_GL_habitat.xlsx") %>% 
+  readxl::read_xlsx(sheet = 1)
+
+cs.habitat <- file.path(rprojroot::find_rstudio_root_file(),
+                             "data/2014/IBI_summer 2014_chem and susq_habitat.xlsx") %>% 
+  readxl::read_xlsx(sheet = 1)
+
+ne.habitat <- file.path(rprojroot::find_rstudio_root_file(),
+                             "data/2014/IBI_summer2014_northern and easter_habitat.xlsx") %>% 
+  readxl::read_xlsx(sheet = 1)
+```
+
+```{r}
+new.habitat <- bind_rows(gl.habitat, cs.habitat, ne.habitat) %>% 
+  select(-average) %>% 
+  gather(site, habitat_value, -Question)
+```
+
+```{r}
+import_field_data <- function(file.dir) {
+  import.df <- file.dir %>% 
+    readxl::read_xlsx(sheet = 1, col_names = FALSE) %>% 
+  rownames_to_column() %>% 
+  gather(var, value, -rowname) %>% 
+   spread(rowname, value) %>% 
+  select(-var)
+  
+  names(import.df) <- import.df[1, ]
+  final.df <- import.df[-1, ]
+  
+  return(final.df)
+}
+```
+
+```{r}
+gl.field <- file.path(rprojroot::find_rstudio_root_file(),
+                             "data/2014/IBI_2014_GL_field data.xlsx") %>% 
+  import_field_data()
+
+
+cs.field <- file.path(rprojroot::find_rstudio_root_file(),
+                             "data/2014/IBI_summer 2014_chem and susq_field data sheet.xlsx") %>% 
+  import_field_data()
+
+ne.field <- file.path(rprojroot::find_rstudio_root_file(),
+                             "data/2014/IBI_summer2014_northern and eastern_field data sheet.xlsx") %>% 
+  import_field_data()
+```
+
+```{r}
+new.field <- bind_rows(gl.field, cs.field, ne.field) 
+```
+

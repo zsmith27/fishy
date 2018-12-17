@@ -1,0 +1,673 @@
+---
+title: "Fishy"
+output: 
+  html_notebook:
+    toc: true
+    toc_float: true
+---
+# Introduction
+
+This document was created using R-Notebook, which aids in creating 
+descriptive, reproducible analyses.
+
+## The tidyverse
+
+The packages `dplyr` and `tidyr` are used throughout this analysis. These packages
+are from the `tidyverse`, which uses a slightly different syntax than base R. 
+The `tidyverse` syntax is intended to reduce typing and to produce more readable
+code. Although the syntax takes some time to learn, I find these packages
+to be very helpful for manipulating data. Whenever I use these functions in this
+document I have tried specify the package that they come from by adding the prefix
+`dplyr::` or `tidyr::`. The prefix is not necessary if you load the package using
+`library()` but I thought it might help to clarify which package the function
+is derived from. 
+
+The `tidyverse` syntax is referred to as Non-Standard Evaluation (NSE). NSE 
+allows the user to refer to columns by name without specifying the
+data frame for each column and without having to quote the column name.
+For example, imagine you want to keep all rows from your data frame,
+`df`, where `col.x == TRUE`. In base R, you could write `df[df$col.x == TRUE, ]`
+to filter your data frame. The `dplyr` function, `filter`, is more descriptive 
+of the action you want to perform and only requires the user to specify the
+data frame once. To perform the same filter as above with `dplyr`, 
+you would write `filter(df, col.x == TRUE)`. Another useful function from 
+`dplyr` is `select`. Imagine `df` has 26 columns and you only want to keep
+columns `col.x`, `col.y`, and `col.z`. In base R, you could write 
+`df[, c("col.x", "col.y", "col.z")]`. To perform the same action with `dlyr` 
+you would use `select(df, col.x, col.y, col.z)`. The `dplyr` function are 
+more descriptive and generally require less typing.
+
+Another useful feature of the `tidyverse` is the `magrittr` pipe function, `%>%`. 
+The pipe allows the user to chain multiple functions together. The example provided
+by Wickham and Grolemund (2016) is `x %>% f(y)` is equivalent to `f(x, y)`. 
+Wickham and Grolemund (2016) also suggest reading `%>%` as "then". The following
+example would be read as specify `df` as your data frame, then select columns 
+`col.x`, `col.y`, and `col.z`, and then filter rows so that `col.x == TRUE`.
+
+```{r eval=FALSE}
+df %>% 
+select(col.x, col.y, col.z) %>% 
+filter(col.x == TRUE)
+```
+
+# Preparation
+
+## Import Packages
+Load `dplyr` and `tidyr` for data manipulation.
+```{r, message=FALSE}
+library(dplyr)
+library(tidyr)
+```
+
+The `Benthos` package is the package I am currently developing. 
+`Benthos` is stored on github and can be installed by using 
+`devtools::install_github("zsmith27/Benthos", ref = "nse")`. 
+If you receive an error when attempting to install from GitHub, 
+try running `install.packages(c("devtools","curl", "httr"))` and
+then `devtools::install_github("zsmith27/Benthos", ref = "nse")` again. 
+If the issue persists please inform me on my GitHub page.
+
+```{r}
+library(Benthos)
+```
+
+## Taxonomic Data
+### Historical Dataset
+The taxonomic count data is imported below. All of the column names 
+are converted to lower case to standardize naming scheme and to make it
+easier to type the column names. 
+
+Some of the species names in column `species` 
+contained abbreviations or were spelled wrong. The `species` column will be used
+to join taxonomic hierarchy information from the Integrated Taxonomic 
+Information System (ITIS). Therefore, the names in the `species` columns must be
+equivalent to the names found in ITIS. `dplyr` functions `mutate` and `case_when`
+where used to update the `species` column. `mutate` allows the 
+user to create or overwrite existing columns. `case_when` is equivalent to 
+`ifelse` but the syntax is nicer. An example from within the `case_when` call 
+below, `species == "n. hog sucker" ~ "northern hog sucker",` would be interpreted 
+as replace "n. hog sucker" with "northern hog sucker" in column `species`. The final
+line within `case_when`, `TRUE ~ species`, says if the row does not meet any of the 
+requirements above then keep the `species` name originally given.
+
+`mutate` and `case_when` are used on columns `water_type`, `tolerance`, 
+`native`, and `trophic_class` to make them more descriptive. These 
+descriptions will be implemented into the column names during metric 
+calculation; therefore, it is beneficial to be more descriptive because 
+it is easier to interpret `rich_top_carnivore` rather than `rich_tc`.
+
+Finally, column `species` is re-named to `venacular_name` to be consistent with 
+ITIS. `venacular_name` will be used to join the taxonomic counts data frame 
+with the taxonomic hierarchy information from ITIS. Additionally, ITIS uses the 
+scientific name to fill the `species` column. Joining two data frames that contain 
+the same column names but different values within those columns creates issues.
+
+__Question:__ Do we not have any life stage codes (e.g., YOY or fingerlings) for the historical data?
+
+```{r}
+#------------------------------------------------------------------------------
+# Import fish data.
+historical.data <- read.csv("data/all_fish_data.csv", stringsAsFactors = FALSE) %>% 
+  # Change column names to uppercase.
+  dplyr::rename_all(tolower) %>% 
+  dplyr::mutate(
+    species = stringr::str_to_lower(species),
+    life_stage = case_when(stringr::str_detect(species, "yoy") ~ "yoy",
+                           stringr::str_detect(species, "fingerling") ~ "fingerling",
+                           TRUE ~ "adult"),
+    species = case_when(
+      species == "n. hog sucker" ~ "northern hog sucker",
+      species == "horneyhead chub" ~ "hornyhead chub",
+      species == "mumichog" ~ "mummichog",
+      species == "n. redbelly dace" ~ "northern redbelly dace",
+      species == "silver redshorse" ~ "silver redhorse",
+      species == "e. mudminnow" ~ "eastern mudminnow",
+      species == "e. silvery minnow" ~ "eastern silvery minnow",
+      species == "e. sand darter" ~ "eastern sand darter",
+      species == "trout perch" ~ "trout-perch",
+      TRUE ~ species
+    ),
+    water_type = case_when(
+      water_type == "C" ~ "cold_water",
+      water_type == "F" ~ "facultative_water",
+      water_type == "W" ~ "warm_water",
+      TRUE ~ "ERROR"
+    ),
+    tolerance = case_when(
+      tolerance == "I" ~ "intolerant",
+      tolerance == "M" ~ "moderately_tolerant",
+      tolerance == "T" ~ "tolerant",
+      TRUE ~ "ERROR"
+    ),
+    native = case_when(
+      native == "YES" ~ "native",
+      native == "NO" ~ "non_native",
+      TRUE ~ "ERROR"
+    ),
+    trophic_class = case_when(
+      trophic_class == "BH" ~ "benthic_herbivore",
+      trophic_class == "BI" ~ "benthic_insectivore",
+      trophic_class == "GF" ~ "generalist",
+      trophic_class == "NF" ~ "NF", # What does this stand for?
+      trophic_class == "PF" ~ "PF", # What does this stand for?
+      trophic_class == "PI" ~ "PI", # What does this stand for?
+      trophic_class == "TC" ~ "top_carnivore",
+      trophic_class == "WC" ~ "water_column_insectivore",
+      TRUE ~ "ERROR"
+    )) %>% 
+  dplyr::rename(vernacular_name = species)
+```
+
+### Transform to Long Format
+
+The data is converted to a long data format using the `tidyr` function 
+`gather`. In the script below columns `btnt` through `algy_3`, which are 
+site names, are transformed into two columns `site` and `count`. The column 
+names are used to populate `site`, while the column values are used to 
+populate `count`. Values equal to zero are not useful, and thus, are removed. 
+The `site` column character strings are converted to all caps to be 
+consistent with the NYSDEC naming scheme. Finally, columns `family`, 
+`cold_water`, `warm_water`, `cold_bogs`, and `warm_bogs` are removed from 
+the data frame. The `select` function allows you to specify columns you 
+want to remove by adding a minus sign in front of the column name.
+
+```{r}
+historical.long <- historical.data %>% 
+  tidyr::gather(site, count, btnt:algy_3) %>% 
+  dplyr::filter(count > 0) %>% 
+  dplyr::mutate(site = toupper(site)) %>% 
+  dplyr::select(-family, -cold_water, -warm_water,
+                -cold_bogs, -warm_bogs)
+  
+```
+
+### Extract Taxonomic Attributes
+
+```{r}
+attr.df <- historical.long %>% 
+  select(-site, -count, -life_stage) %>% 
+  distinct()
+
+historical.long <- historical.long %>% 
+  select(site, vernacular_name, life_stage, count)
+```
+
+
+### 2014 Dataset
+
+```{r}
+library(readxl)
+gl.df <- readxl::read_xlsx("data/2014/IBI_2014_GL_fish.xlsx", sheet = 1)
+susq.df <- readxl::read_xlsx("data/2014/IBI_summer 2014_chem and susq_fish data.xlsx", sheet = 1)
+ne.df <- readxl::read_xlsx("data/2014/IBI_summer2014_northeast_fish data.xlsx", sheet = 1)
+```
+
+
+```{r}
+new.long <- dplyr::full_join(gl.df, susq.df, by = "Site ID") %>% 
+  dplyr::full_join(ne.df, by = "Site ID") %>% 
+  tidyr::gather(site, count, 2:ncol(.)) %>% 
+  dplyr::filter(!is.na(count), count != 0) %>% 
+  dplyr::rename(vernacular_name = 'Site ID') %>% 
+  dplyr::mutate(
+    count = as.numeric(count),
+    vernacular_name = stringr::str_to_lower(vernacular_name),
+    life_stage = case_when(stringr::str_detect(vernacular_name, "yoy") ~ "yoy",
+                           stringr::str_detect(vernacular_name, "fingerling") ~ "fingerling",
+                           TRUE ~ "adult"),
+    vernacular_name = case_when(
+      vernacular_name %in% "n. hog sucker" ~ "northern hog sucker",
+      vernacular_name %in% "horneyhead chub" ~ "hornyhead chub", 
+      vernacular_name %in% "sculpin" ~ "freshwater sculpins", 
+      vernacular_name %in% "n. redbelly dace" ~ "northern redbelly dace",
+      vernacular_name %in% "e. brook trout" ~ "brook trout",
+      vernacular_name %in% "largemouth bass yoy" ~ "brook trout",
+      vernacular_name %in% "brown trout yoy"  ~ "brook trout",
+      vernacular_name %in% "brook trout yoy" ~ "brook trout",
+      vernacular_name %in% "smallmouth bass yoy" ~ "brook trout",
+      vernacular_name %in% "rainbow trout yoy" ~ "brook trout",
+      vernacular_name %in% "brown trout fingerlings" ~ "brook trout",
+      vernacular_name %in% "sunfish spp." ~ "common sunfishes",
+      vernacular_name %in% "unknown shiner"  ~ "minnows",
+      vernacular_name %in% "unknown species" ~ "unknown",
+      TRUE ~ vernacular_name
+    )) %>% 
+  filter(!vernacular_name %in% c("minnows", "unknown", "snapping turtles",
+                                 "common sunfishes", "freshwater sculpins"))
+```
+
+### Join Historical and 2014 Data
+
+```{r}
+fish.long <- dplyr::bind_rows(historical.long, new.long)
+```
+
+### Join Taxonomic Counts with Taxonomic Attributes
+
+```{r}
+fish.long <- dplyr::left_join(fish.long, attr.df, by = "vernacular_name")
+```
+
+
+### Assign Taxonomic Hierarchy
+
+The ITIS database is stored on my computer and accessed using a separate 
+script. The vernacular table is imported from the ITIS database and only 
+the English vernacular names are kept. A number of Taxonomic Serial Numbers
+(TSNs) represented the same vernacular name. This created duplicate entries. 
+The vector of TSNs below were removed from the data frame.
+```{r, message=FALSE}
+source("postgres/access_itis.R")
+
+vern.df <- tbl(conn, "vernaculars") %>% 
+  data.frame() %>% 
+  mutate(tsn = as.character(tsn),
+         vernacular_name = tolower(vernacular_name)) %>%
+  filter(language == "English") %>% 
+  select(tsn, vernacular_name) %>% 
+  filter(!tsn %in% c("163804", "163895", "640068", "163837", "168159", 
+                     "164042", "163874", "164044", "163767", "163592", 
+                     "164040","650164", "159708", "163938", "163439",
+                     "163833", "161100", "161101", "161102", "161103",
+                     "161797", "161807", "168506", "168508", "168389",
+                     "162141", "162142"))
+```
+
+The taxonomic count data frame is joined with the ITIS vernacular data frame 
+by the `vernacular_name`. This step assigns each taxon the appropriate TSN. 
+The `dplyr` function `left_join` allows the user to specify a column that contains 
+shared values between two data frames, and thus, could be used to merge the data 
+frames. In the script below, the "left" within `left_join` specifies that only 
+`vernacular_names` within `fish.long` should be retained. Any additional 
+`vernacular_names` found in `vern.df` will not be included in the new joined 
+data frame.
+```{r}
+fish.long <- dplyr::left_join(fish.long, vern.df, by = "vernacular_name")
+
+dups.df <- fish.long %>% 
+  dplyr::group_by(site, vernacular_name, life_stage, count) %>% 
+  dplyr::summarise(total = n()) %>% 
+  dplyr::arrange(desc(total)) %>% 
+  dplyr::filter(total > 1)
+
+if (nrow(dups.df) > 0) DT::datatable(dups.df)
+
+```
+
+The ITIS taxonomic hierarchy data is imported below. Column names 
+are converted to lower case and only a subset of columns were retained.
+```{r}
+# Import fish hierarchy.
+hier.df <- data.table::fread("data/fish_hierarchy.csv",
+                             stringsAsFactors = FALSE,
+                             colClasses = "character",
+                             na.strings=c("")) %>% 
+  dplyr::rename_all(tolower) %>% 
+  dplyr::select(tsn, rank_name, class, superorder, order, suborder, superfamily, family, subfamily,
+         tribe, genus, species) 
+```
+
+The taxonomic count data is joined with the ITIS taxonomic hierarchy data 
+by the `tsn` column.
+```{r}
+fish.long <- dplyr::left_join(fish.long, hier.df, by = "tsn")
+```
+
+## Station Data
+
+### Import
+
+The station and environmental data is imported and all of the names are 
+converted to lower case.
+```{r}
+env.df <- data.table::fread("data/historicalenvdata_final.csv",
+                              data.table = FALSE) %>% 
+  dplyr::rename_all(tolower)
+```
+
+### Disturbance  (HELP)
+
+A disturbance gradient was created with specific conductance (`conduct`), 
+the percentage of forested land in the watershed delineated above the sampling
+site (`pct_forest`), and the percentage of developed land in the watershed 
+delineated above the sampling site (`pct_developed`). If `conduct` was less than 
+or equal to 250 microsiemens __and__ `pct_forest` was greater than or equal to 75%, 
+then the site was classified as "reference". If `conduct` was greater than or 
+equal to 800 microsiemens __or__ `pct_developed` was greater than or equal to 
+25%, then the site was classified as "degraded". Any sites that did not meet these 
+specifications were classified as "moderately degraded".
+
+I think these specification need to be updated but I want to get some consensus from the group.
+```{r}
+env.df <- env.df %>% 
+  mutate(gradient = case_when(
+    conduct <= 250 & pct_forest >= 75  ~ "reference",
+    conduct >= 800 | pct_developed >= 25 ~ "degraded",
+    TRUE ~ "moderately degraded"
+  ))
+table(env.df$gradient)
+```
+
+### Join Disturbance Gradient with Taxonomic Data
+
+The `env.df` was subset to only include columns `site`, 
+`gradient`, `orig_ibiclassdrainage`, and `ibi_class`. 
+`orig_ibiclassdrainage` was renamed to `drainage_size` and 
+`ibi_class` was renamed to `basin`.
+
+The subset environmental data, `env.sub`, is joined with the taxonomic 
+count data by `site`.
+```{r}
+env.sub <- env.df %>% 
+  dplyr::select(site, gradient, orig_ibiclassdrainage, ibi_class) %>% 
+  dplyr::rename(drainage_size = ibi_class,
+                basin = orig_ibiclassdrainage)
+
+fish.long <- dplyr::left_join(fish.long, env.sub, by = "site")
+```
+
+
+# Metric Calculation
+
+Metrics are calculated using the `Benthos` package that I am developing.
+
+## Sequence Metrics
+
+The `Benthos` function `seq_taxa` allows the user to sequence across a 
+specified vector of column names and calculate the percentage, abundance, 
+or richness of each taxon in the specified columns. The vector of column 
+names currently being used is `hier.vec`. You will notice that this vector 
+does not just include taxonomic columns, but also, taxonomic attribute columns. 
+Each taxonomic attribute is treated like a unique taxon, and therefore, the 
+percentage, abundance, and richness of each taxonomic attribute can also be 
+calculated. The `seq_taxa` function can only do one `job` at a time. The `dplyr` 
+function `bind_cols` is used to append columns together from each `seq_taxa` call. 
+Each metric calculated with the `seq_taxa` function will be named with a prefix 
+designated to the specified `job` ("pct" = percentage, "abund" = abundance, and 
+"rich" = richness) followed by the taxonomic name or taxonomic attribute name.
+
+```{r, message=FALSE}
+hier.vec <- c("water_type", "tolerance", "native", "trophic_class",
+              "class", "superorder", "order", "suborder", "superfamily",
+              "family", "subfamily", "tribe", "genus", "species")
+
+seq.df <- Benthos::seq_taxa(fish.long, site, count, hier.vec, job = "pct") %>% 
+  dplyr::bind_cols(Benthos::seq_taxa(fish.long, site, count, hier.vec, job = "abund")) %>% 
+  dplyr::bind_cols(Benthos::seq_taxa(fish.long, site, count, hier.vec[!hier.vec %in% "species"],
+                     high.taxa.col = "species", job = "rich"))
+```
+
+## Additional Metrics
+
+Create a new data frame to store metric values. Keep only the columns 
+that will be useful in subsequent analyses.
+```{r}
+metrics.df <- fish.long %>% 
+  select(site, gradient, basin, drainage_size) %>% 
+  distinct()
+```
+
+The `seq_taxa` function cannot be used to calculate all metrics. Below 
+total species richness, weighted species richness, total abundance, and 
+the percent of dominant taxa (1, 2, 3, 4, and 5). `pct_`, `abund_`, and 
+`rich_` `insectivores` was calculated as the sum of the corresponding 
+`benthic_insectivore`, `water_column_insectivore`, and `pi` metrics calculated 
+with `seq_taxa`.
+```{r}
+#==============================================================================
+metrics.df <- dplyr::bind_cols(metrics.df, seq.df)
+
+metrics.df <- metrics.df %>% 
+  mutate(richness = taxa_rich(fish.long, site, count, family, species)) %>% 
+  left_join(env.df[, c("site", "width")], by = "site") %>% 
+#  mutate(weighted_richness =
+#           case_when(
+#             width <= 4 ~ richness + 2,
+#             width > 4 & width <= 9 ~ as.double(richness),
+#             width > 9 & width <= 19 ~ richness - 2,
+#             width > 19 ~ richness - 4,
+#             is.na(width) ~ as.numeric(NA),
+#             TRUE ~ as.numeric(NA)
+#           )) %>% 
+  select(-width) %>% 
+  mutate(abundance = taxa_abund(fish.long, site, count, species),
+         shannon = taxa_div(fish.long, site, count, species, job = "shannon", base = 2),
+         simpson = taxa_div(fish.long, site, count, species, job = "simpson"),
+         hill_2 = taxa_div(fish.long, site, count, species, job = "hill", q = 2),
+         pct_dom1 = pct_dom(fish.long,
+                        unique.id.col = site,
+                        count.col = count,
+                        taxa.col = species,
+                        dom.level = 1),
+         pct_dom2 = pct_dom(fish.long,
+                        unique.id.col = site,
+                        count.col = count,
+                        taxa.col = species,
+                        dom.level = 2),
+         pct_dom3 = pct_dom(fish.long,
+                        unique.id.col = site,
+                        count.col = count,
+                        taxa.col = species,
+                        dom.level = 3),
+         pct_dom4 = pct_dom(fish.long,
+                        unique.id.col = site,
+                        count.col = count,
+                        taxa.col = species,
+                        dom.level = 4),
+         pct_dom5 = pct_dom(fish.long,
+                        unique.id.col = site,
+                        count.col = count,
+                        taxa.col = species,
+                        dom.level = 5),
+         pct_insectivores = sum(pct_benthic_insectivore,
+                                pct_water_column_insectivore,
+                                pct_pi),
+         abund_insectivores = sum(abund_benthic_insectivore,
+                                abund_water_column_insectivore,
+                                abund_pi),
+         rich_insectivores = sum(rich_benthic_insectivore,
+                                rich_water_column_insectivore,
+                                rich_pi))
+```
+
+
+`r ncol(metrics.df) - 4` metrics were calculated.
+
+# Metric Sensitivity
+
+To calculate metric sensitivity we will install the other package I 
+am developing, `mmi`. This package is also available on GitHub and can be 
+installed with `devtools::install_github("zsmith27/MMI", ref = "build")`.
+If you have difficulties installing the package please try running 
+`install.packages(c("devtools","curl", "httr"))` and then run 
+`devtools::install_github("zsmith27/MMI", ref = "build")` again. If 
+the issue persists, please contact me through my GitHub page.
+```{r, message=FALSE}
+library(MMI)
+```
+
+## State-Wide Index
+
+Metric sensitivity was calculated without splitting the data by basin or drainage area. 
+This spatial resolution would create a single index for New York State. 
+```{r}
+#table.df <- table(metrics.df$gradient) %>% 
+#  data.frame() %>% 
+  
+```
+
+```{r}
+sens.all <- MMI::sensitivity(metrics.df,
+                        first.metric = "pct_warm_water",
+                        condition.colname = "gradient",
+                        ref.cond = "reference",
+                        deg.cond = "degraded",
+                        method = "ALL") %>% 
+  dplyr::rename_all(tolower) %>% 
+  dplyr::arrange(desc(de_sensitivity))
+```
+
+### State-Wide Metric Sensitivity
+
+The table shows a portion of the output from `MMI` function `sensitivity`. 
+
+* `disturbance` =
+    + "INCREASE" if the metric increases with disturbance
+    + "DECREASE" if the metric decreases with disturbance
+    + "EQUAL" if there is no change due to disturbance
+* `barbour_sensitivity` = the barbour visual method was automated.
+    + 0 = Overlap of the reference median with the degraded IQR and overlap of the degraded median with the reference IQR
+    + 1 = Overlap of either one distributions median with the other distributions IQR
+    + 2 = Overlap of the reference IQR with the degraded IQR but no overlap of median values
+    + 3 = No overlap of the IQR of reference and degraded distributions
+* `de_sensitivity` = Discrimination Efficiency (DE) is the most popular method for calculating metric sensitivity. For metrics that decrease with disturbance, DE is the percentage of degraded samples correctly identified below the reference 25th percentile. For metrics that increase with disturbance, DE is the percentage of degraded samples correctly identified above the reference 75th percentile. 100 is the best possible value and 0 is the worst. Typically, values greater than or equal to 75 are considered good.
+* `bde_sensitivity` = Balanced Discrimination Efficiency (BDE) is a measure that I have been working on with my boss Claire Buchannan. The standard DE method is kind of arbitrary. Our method tests every reference percentile as a potential threshold for splitting reference and degraded distributions. DE only tests the reference 25th or 75th percentile as a splitting point.  We also aim to balance the number of reference correctly identified with the threshold with the number of degraded correctly identified.  I think this method is great but it is still in development; therefore, it is probably safer to just stick with Barbour et al.'s (1996) method and the DE method.
+
+Each table represents only the top 10 performing metrics.
+```{r}
+sens.all %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::select(1:6) %>% 
+  dplyr::slice(1:10) %>% 
+  DT::datatable(options = list(dom = 't'))
+```
+
+## Basin Indices
+
+This spatial resolution divides NYS into four basins and is consistent 
+with Anne's thesis.
+```{r}
+table.df <- table(metrics.df$basin, metrics.df$gradient) %>% 
+  data.frame() %>% 
+  dplyr::rename(basin = Var1,
+                gradient = Var2) %>% 
+  tidyr::spread(gradient, Freq) %>% 
+  dplyr::select(basin, reference, 'moderately degraded', degraded)
+DT::datatable(table.df, options = list(dom = 't'))
+```
+
+
+```{r}
+basin.list <- lapply(unique(metrics.df$basin), function(basin.i) {
+  sub.df <- dplyr::filter(metrics.df, basin == basin.i)
+  sens.df <- MMI::sensitivity(sub.df,
+                        first.metric = "pct_warm_water",
+                        condition.colname = "gradient",
+                        ref.cond = "reference",
+                        deg.cond = "degraded",
+                        method = "ALL") %>% 
+  dplyr::rename_all(tolower) %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::mutate(basin = basin.i) %>% 
+  dplyr::select(basin, everything())
+})
+
+sens.basin <- dplyr::bind_rows(basin.list)
+```
+
+### North/East Metric Sensitivity
+```{r}
+sens.basin %>% 
+  dplyr::filter(basin == "North/East") %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::select(1:6) %>% 
+  dplyr::slice(1:10) %>% 
+  DT::datatable(options = list(dom = 't'))
+```
+
+### Great Lakes Metric Sensitivity
+```{r}
+sens.basin %>% 
+  dplyr::filter(basin == "Great Lakes") %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::select(1:6) %>% 
+  dplyr::slice(1:10) %>% 
+  DT::datatable(options = list(dom = 't'))
+```
+
+### Chesapeake Metric Sensitivity
+```{r}
+sens.basin %>% 
+  dplyr::filter(basin == "Chesapeake") %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::select(1:6) %>% 
+  dplyr::slice(1:10) %>% 
+  DT::datatable(options = list(dom = 't'))
+```
+
+### Mississippi Metric Sensitivity
+```{r}
+sens.basin %>% 
+  dplyr::filter(basin == "Mississippi") %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::select(1:6) %>% 
+  dplyr::slice(1:10) %>% 
+  DT::datatable(options = list(dom = 't'))
+```
+
+
+## Drainage Size Indices
+
+This spatial resolution divides NYS up into two drainage sizes 
+(i.e., "Headwater" and "Mid-Order") and the "Mississippi basin". 
+This spatial resolution is based on the new groups specified by A.J.
+```{r}
+table.df <- table(metrics.df$drainage_size, metrics.df$gradient) %>% 
+  data.frame() %>% 
+  dplyr::rename(drainage_size = Var1,
+                gradient = Var2) %>% 
+  tidyr::spread(gradient, Freq) %>% 
+  dplyr::select(drainage_size, reference, 'moderately degraded', degraded)
+DT::datatable(table.df, options = list(dom = 't'))
+```
+
+
+```{r}
+drainage.list <- lapply(unique(metrics.df$drainage_size), function(drainage.i) {
+  sub.df <- dplyr::filter(metrics.df, drainage_size == drainage.i)
+  sens.df <- MMI::sensitivity(sub.df,
+                        first.metric = "pct_warm_water",
+                        condition.colname = "gradient",
+                        ref.cond = "reference",
+                        deg.cond = "degraded",
+                        method = "ALL") %>% 
+  dplyr::rename_all(tolower) %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::mutate(drainage_size = drainage.i) %>% 
+  dplyr::select(drainage_size, everything())
+})
+
+sens.drainage <- dplyr::bind_rows(drainage.list)
+
+```
+
+### Headwater Metric Sensitivity
+```{r}
+sens.drainage %>% 
+  dplyr::filter(drainage_size == "Mississippi") %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::select(1:6) %>% 
+  dplyr::slice(1:10) %>% 
+  DT::datatable(options = list(dom = 't'))
+```
+
+### Mid-Order Metric Sensitivity
+```{r}
+sens.drainage %>% 
+  dplyr::filter(drainage_size == "Mid-Order") %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::select(1:6) %>% 
+  dplyr::slice(1:10) %>% 
+  DT::datatable(options = list(dom = 't'))
+```
+
+### Mississippi Metric Sensitivity
+```{r}
+sens.drainage %>% 
+  dplyr::filter(drainage_size == "Headwater") %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::select(1:6) %>% 
+  dplyr::slice(1:10) %>% 
+  DT::datatable(options = list(dom = 't'))
+```
+
