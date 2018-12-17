@@ -1,0 +1,80 @@
+SITE,NAME,STATION,BASIN,latitude,longitude,IBI_Class,Sqrt_Cluster,PrAb_Cluster,Category,Date,depth,width,temp,conduct,ph,DO,PCT_FOREST,DA(mi2),Canopy,pct_Water,pct_Developed,pct_Barren,pct_Forested,pct_Shrubland,pct_Cultivated,pct_Wetland,pct_Grassland,Orig_IBIClassdrainage
+NEVR_2,"Neversink R (4) mid, blw Woodbourne, bridge by prison, at T51, side channel",3,Delaware,41.76,-74.59917,Headwater,3,2,REF,2005,0.2,40,11,19,7.1,10.2,93,112.9,10,0,97,0,3,0,0,0,0,North/East
+BSHR,"Basher Kill, GALLEY HILL RD, AT T1",1,Delaware,41.45361,-74.58945,Headwater,4,2,REF,2005,0.2,15,18,107,6.3,10.6,90,72.2,25,0,54,0,46,0,0,0,0,North/East
+EDEL,"East Branch Delaware mid, Arkville b/w Bushkill",03A,Delaware,42.16111,-74.62083,Headwater,3,2,REF,2005,0.1,5,16,129,7.2,7.3,87,75.6,25,0,14,0,41,0,43,3,0,North/East
+DEER_A,Deer R. .2 blw T28,A,Black,43.723389,-75.701389,Headwater,2,2,REF,9/22/2000,0.2,8,14,87,7.5,15.6,87,2.7,82,0,0,0,14,0,0,86,0,Great Lakes
+GIPS,Gipsy Trail,1,Lower Hudson,41.43222,-73.69945,Headwater,4,2,REF,1995-2000,0.2,4,23,120,6.4,8.1,86,3.6,20,0,24,0,76,0,0,0,0,North/East
+WBCR,W. Br Croton R.,1,Lower Hudson,41.4115,-73.6925,Headwater,4,2,REF,8/19/1996,0.3,15,25,97,6.8,8.4,82,40.1,90,0,64,0,33,0,3,0,0,North/East
+LSAN_3,LSAN- 3,1,Ontario,43.64639,-76.06416,Headwater,3,2,REF,1995-2000,0.2,10,23,158,8.1,11,58,1.9,10,0,46,0,0,17,26,0,11,Great Lakes
+WILL,"Willowemoc R, mouth; Willowemoc R, mouth, Roscoe, PFR path, along Rte 179",8,Delaware,41.93028,-74.91528,Mid-Order,2,1,REF,NA,0.3,10,17,99,7.2,6.5,93,126.8,10,0,86,0,0,0,0,14,0,North/East
+MEAD,"Meads Ck, Rte 415",1,Chemung,42.19468,-77.14198,Mid-Order,2,1,REF,9/12/2002,0.1,5,22,99,8.3,12.8,87,68.1,10,0,0,0,83,0,0,17,0,Chesapeake
+LDEL,"Little Delaware R. Delhi, at mouth",01A,Delaware,42.2578,-74.9275,Mid-Order,3,1,REF,2005,0.1,15,15,112,7.5,15,81,52.1,NA,0,71,0,0,0,29,0,0,North/East
+WDEL_1,"W. Br. Delaware R. (2), Delhi, Sherwood Rd to golf course",03A,Delaware,42.25972,-74.92861,Mid-Order,2,1,REF,2005,0.3,20,3,112,7.6,13.7,81,52.1,0,0,22,0,22,0,24,32,0,North/East
+WDHL_2,Woodhull Ck,1,Black,43.46333,-75.1725,Mid-Order,3,1,REF,9/21/2001,0.2,10,16,50,7.2,9.3,79,68.9,10,0,0,0,57,14,0,29,0,Great Lakes
+NVUS,"Schenevus Creek, Colliersville, Rte 28",3,Susquehanna,42.48556,-74.96944,Mid-Order,2,1,REF,6/9/2004,0.2,10,15,144,7.4,11.7,76,118,0,0,15,0,15,0,47,24,0,Chesapeake
+SNAK,"Snake Creek, Corbetsville; above route 7A",1,Susquehanna,42.015,-75.7887,Mid-Order,2,1,REF,9/7/2004,0.1,15,27,123,8.4,8.8,76,74.9,0,0,41,0,0,24,24,11,0,Chesapeake
+SHEL,"Sheldrake Str (2), abv Kiamesha Ck",1,Delaware,41.67083,-74.62611,Mid-Order,3,2,REF,2005,0.2,6,23,144,7,7.7,75,14.6,80,0,44,0,53,0,0,0,3,North/East
+CALL,"Callicoon Ck (4), mouth, at Callicoon",6,Delaware,41.76444,-75.05556,Mid-Order,2,1,REF,2005,0.1,20,16,155,7.2,9.1,73,111.3,10,0,86,0,14,0,0,0,0,North/East
+DELA_1,"Deleware River (4),Callicoon, abv brdg to PA",7,Delaware,41.7652,-75.06036,Mid-Order,2,1,REF,2005,0.5,60,16,100,7.1,9.6,73,112,10,17,28,0,19,0,22,14,0,North/East
+NANG,"Chenango River, blw Hart Road CO Rt 106 up to (Eagleville Brook) Morrisville",0,Susquehanna,42.88417,-75.63889,Mid-Order,2,1,REF,6/9/2004,0.3,5,15,624,8.4,12,49,12.4,0,0,0,0,6,0,14,80,0,Chesapeake
+REDH,Red House Bk,1,Allegheny,42.09964,-78.73546,Mississippi,1,3,REF,8/26/1999,0.1,8,24,80,8,11.6,98,15.2,38,0,14,0,86,0,0,0,0,Mississippi
+TUNG_4,"Tunungwant, .5mi abv Rice Rd,gbps",3,Allegheny,42.07155,-78.64404,Mississippi,1,3,REF,8/20/2001,0.2,30,24,260,7.7,9,93,168.9,46,0,0,0,57,0,0,43,0,Mississippi
+FORK,"Forks Ck, along Sugartwon Rd to .1 mi blw Clare Ck, property with truck bed/bridge",1,Allegheny,42.22667,-78.63055,Mississippi,4,3,REF,6/21/2001,0.2,7,14,131,7.4,9.9,83,24.8,40,0,34,0,34,0,31,0,0,Mississippi
+CLER_1,"Clear Ck, Thornton",0,Allegheny,42.25766,-79.15351,Mississippi,4,3,REF,5/4/2001,0.3,2.5,18,229,7.7,9.8,80,7.6,58,0,17,0,54,0,29,0,0,Mississippi
+GVAL_1,"Great Valley Ck, abv Ashford Jct",0,Allegheny,42.27383,-78.66967,Mississippi,4,3,REF,5/3/2001,0.3,7,24,291,8.4,11.1,78,42.9,14,0,100,0,0,0,0,0,0,Mississippi
+WSBR,"West Brook, blw I87, L. George, gage rd. off of sewell",2,Champlain,43.4163,-73.717,Headwater,4,3,TEST,8/2/2004,0.3,3,12,374,7.3,10.3,96,8,40,0,72,0,19,0,0,9,0,North/East
+CADE,"Cascade Brook, Keene, at mouth, church street",1,Champlain,44.2625,-73.79583,Headwater,3,2,TEST,8/10/2004,0.2,4,16,491,7.6,9.9,95,6.6,60,0,20,0,71,0,0,9,0,North/East
+CROK,Crook Bk,1,Lower Hudson,41.32361,-73.5975,Headwater,3,2,TEST,1995-2000,0.1,3,24,329,7.9,7.8,90,3.9,80,0,21,0,29,9,0,41,0,North/East
+BVRD,"Stone Hill River,",3,Lower Hudson,41.24611,-73.66917,Headwater,3,2,TEST,1995-2000,0.2,10,22,302,8,10,82,13.5,90,0,25,0,53,0,22,0,0,North/East
+KEND,Bear Gutter,1,Atlantic-LI,41.11444,-73.72361,Headwater,4,2,TEST,1995-2000,0.2,4,26,1176,7.1,2.2,81,0.6,90,0,60,0,40,0,0,0,0,North/East
+CROS,Cross R.,1,Lower Hudson,41.26028,-73.60194,Headwater,3,2,TEST,9/17/2003,0.2,8,21,288,7.8,9.1,71,17.1,30,0,14,0,0,11,74,0,0,North/East
+HALF_2,Halfway Creek,6,Champlain,43.42667,-73.49722,Headwater,3,2,TEST,1995-2000,0.3,15,22,329,7.8,7.5,70,79.5,20,0,23,0,46,0,11,20,0,North/East
+BRAD,"Brady Brook, Rte. 22",1,Lower Hudson,41.53222,-73.58417,Headwater,3,2,TEST,1995-2000,0.2,3,16,371,7.5,8.8,69,7.7,90,0,56,0,31,0,14,0,0,North/East
+KISC,Kisco R.,2,Lower Hudson,41.22861,-73.74333,Headwater,3,2,TEST,1995-2000,0.1,5,19,501,7.8,8.2,67,17.5,75,0,29,0,71,0,0,0,0,North/East
+MDBR,"Mud Creek, Rt 4 E of Whitehall; blw bridge & Beckwith Rd",1,Champlain,43.56222,-73.34695,Headwater,2,2,TEST,8/2/2004,0.2,5,17,493,8,10.2,64,4.6,90,0,20,0,0,0,60,20,0,North/East
+LOCK,"Croton Trib, Locke Ledge",1,Lower Hudson,41.23583,-73.78833,Headwater,3,2,TEST,1995-2000,0.1,2,23,515,8.3,8.5,63,1.6,30,0,28,0,72,0,0,0,0,North/East
+MILB_4,MILB,5,Black,43.51194,-75.31944,Headwater,3,2,TEST,7/22/1996,0.1,10,11,256,7.5,10.6,60,28,30,0,8,0,27,49,16,0,0,Great Lakes
+MORD_5,Moordener Kill,7,Lower Hudson,42.5402,-73.7187,Headwater,4,2,TEST,1995-2000,0.1,8,14,562,7.3,8.3,55,29.1,80,0,25,0,28,6,42,0,0,North/East
+PLUM,Plum Ck,1,Lower Hudson,41.3225,-73.71361,Headwater,3,2,TEST,1995-2000,0.1,8,21,502,7.6,7.5,55,5.8,80,0,100,0,0,0,0,0,0,North/East
+HUNT,Hunter Bk,1,Lower Hudson,41.29083,-73.83417,Headwater,3,2,TEST,NA,0.1,4,18,505,7.5,7.7,53,3,60,0,97,0,3,0,0,0,0,North/East
+MUSC,Muscoot,1,Lower Hudson,41.33306,-73.76472,Headwater,3,2,TEST,1995-2000,0.2,8,21,550,7.9,7.6,51,13.4,90,0,18,0,76,0,6,0,0,North/East
+BRNX_2,BRNX-2,1,Atlantic-LI,41.07417,-73.77639,Headwater,3,2,TEST,1995-2000,0.3,6,13,336,7.4,9.3,39,3.3,50,0,83,0,17,0,0,0,0,North/East
+HLKS,Hallock Mill Ck,2,Lower Hudson,41.28611,-73.765,Headwater,3,2,TEST,1995-2000,0.1,5,20,628,7,5.4,36,10.7,80,0,83,0,3,14,0,0,0,North/East
+HACK,"Hackensack River, near route 59",1,Passaic- Newark,41.08611,-73.96278,Headwater,4,2,TEST,1995-2000,0.5,10,25,452,7.5,5.7,31,34.6,25,0,41,0,14,0,0,46,0,North/East
+NRUP,"Northrup, N. Greece Rd.",1,Ontario,43.27224,-77.73271,Headwater,1,3,TEST,8/30/2000,0.3,4,17,354,7.7,9.4,29,11.3,40,0,20,0,3,0,77,0,0,Great Lakes
+LARK,"Buttonwood 1999, Janes street",1,Ontario,43.25233,-77.7084,Headwater,4,3,TEST,6/23/1999,0.1,4,15,419,7.7,9.2,27,7.6,100,0,34,0,0,0,0,66,0,Great Lakes
+BOQT,"Boquet River, in sand below rapids",7,Champlain,44.36361,-73.39167,Mid-Order,4,1,TEST,8/3/2004,0.5,40,19,228,8,8.9,90,271.2,25,0,100,0,0,0,0,0,0,North/East
+MBCR,"Middle Branch Croton R., abv Fair st, golf course",1,Lower Hudson,41.47278,-73.65334,Mid-Order,3,2,TEST,1995-2000,0.1,2,68,358,7.5,8.6,88,10.4,100,0,57,0,43,0,0,0,0,North/East
+CDEA_1,"Canacadea Ck, below rte 21",3,Chemung,42.31928,-77.73641,Mid-Order,4,3,TEST,9/26/2002,0.2,15,23,497,7.7,9.8,77,47.6,30,0,38,0,21,0,9,15,18,Chesapeake
+CHER_3,"Cherry Valley Creek, Westville, Rte 43 (by Rabbit Run Rd)",3,Susquehanna,42.6325,-74.88277,Mid-Order,2,1,TEST,9/17/2007,0.2,10,21,215,8,9.6,77,82.3,10,0,17,0,11,0,57,14,0,Chesapeake
+SNOK07,"Snook Kill, Mott Rd",7,Upper Hudson,43.21278,-73.61305,Mid-Order,2,1,TEST,8/5/1990 and 1998,0.3,8,21,366,7.6,7.6,77,52.1,40,0,17,0,0,0,44,39,0,North/East
+CATA_3,Catatonk,3,Susquehanna,42.14167,-76.29472,Mid-Order,2,1,TEST,1995-2000,0.1,25,25,365,8.2,9.6,76,148,10,0,17,0,20,0,63,0,0,Chesapeake
+POSC_2,"Post Ck, Corning, Rte 414, at RR",1,Chemung,42.23089,-76.96214,Mid-Order,2,1,TEST,9/26/2002,0.1,4,23,510,7.9,8.6,75,17.4,90,0,35,0,11,0,16,38,0,Chesapeake
+OWGO_4,EBOwego,7,Susquehanna,42.19444,-76.20611,Mid-Order,2,1,TEST,1995-2000,0.3,15,15,296,7.4,10.7,73,93.1,50,0,6,0,94,0,0,0,0,Chesapeake
+PAGE,"Paige Creek, Richards Hill Rd",1,Susquehanna,42.19767,-75.82507,Mid-Order,2,1,TEST,6/9/2004,0.2,4,26,246,9.3,12.5,71,34.7,30,0,11,0,0,0,89,0,0,Chesapeake
+BTNT,"Butternut Creek, near mouth, flat iron bridge red (above and just below)",8,Susquehanna,42.41945,-75.36139,Mid-Order,2,1,TEST,7/3/2004,0.2,25,21,147,7.3,9.8,71,128.8,50,0,8,0,11,0,72,8,0,Chesapeake
+SING_1,"Sing sing Ck, Rte 352",2,Chemung,42.105,-76.92194,Mid-Order,2,1,TEST,9/26/2002,0.1,7,20,740,7.7,7.4,69,35,80,0,23,0,57,3,17,0,0,Chesapeake
+PTNY,"Poultney River, off rte 22 - Grenier Way, pvt behind houses; 3 mi s. of fairhaven VT.",1,Champlain,43.56667,-73.26195,Mid-Order,4,1,TEST,8/2/2004,0.2,15,18,231,7.8,7.7,68,66,50,0,14,0,0,0,61,25,0,North/East
+GCHZ,"Great Chazy River, Rt. 9, Champlain (v)",5,Champlain,44.98694,-73.44945,Mid-Order,2,1,TEST,8/9/2004,0.3,40,23,187,7.8,6.5,68,261.6,10,0,100,0,0,0,0,0,0,North/East
+METT,"Mettawee River, 0.1 mi abv brdg South of Grays Corrner (upper Turnpike Rd.)",1,Champlain,43.45222,-73.32694,Mid-Order,2,2,TEST,7/19/2001,0.2,30,16,264,8.2,9.2,68,178.2,10,0,0,0,80,0,0,20,0,North/East
+PIPE,"Pipe Creek, Tioga Center",1,Susquehanna,42.06222,-76.35028,Mid-Order,2,3,TEST,6/22/2004,0.4,15,20,85,7.4,7.6,68,45.7,30,0,11,0,89,0,0,0,0,Chesapeake
+NANT,"Nanticoke Creek, Route 17C",1,Susquehanna,42.0919,-76.09,Mid-Order,2,1,TEST,7/21/2004,0.1,20,23,343,7.5,7,67,112.6,25,0,89,0,11,0,0,0,0,Chesapeake
+LCHZ,"Little Chazy River, Stetson road, chazy (v)",1,Champlain,44.90167,-73.415,Mid-Order,2,1,TEST,8/9/2004,0.4,8,21,250,7.8,9.5,67,49.9,75,0,17,0,31,0,53,0,0,North/East
+FIVM,Five Mile Ck,1,Chemung,42.38849,-77.35784,Mid-Order,2,1,TEST,1995-2000,0.3,4,26,417,7.6,9,64,67,0,0,20,0,9,0,71,0,0,Chesapeake
+COHO_9,"Cohocton R., Savona, Rte 226",08A,Chemung,42.28978,-77.22628,Mid-Order,4,1,TEST,9/12/2002,0.1,30,28,509,8.5,14,61,376.3,0,26,20,0,6,0,34,14,0,Chesapeake
+TUSC_2,"Tuscorora Ck, .2 mi abv Rte 5 brdg, near mouth",5,Chemung,42.10327,-77.23372,Mid-Order,4,1,TEST,2005,0.1,10,23,296,7.1,9,60,128.2,0,0,92,0,0,0,0,8,0,Chesapeake
+SEEL_1,Seeley Creek,4,Chemung,42.05278,-76.82195,Mid-Order,4,1,TEST,7/3/2003,0.2,3,26,318,7.3,8.5,58,97.7,0,0,60,40,0,0,0,0,0,Chesapeake
+CORB,"Corbeau Creek, Stetson road, Coopersville",1,Champlain,44.93778,-73.42056,Mid-Order,2,1,TEST,8/9/2004,0.3,5,19,340,7.3,8.8,47,27.8,75,0,75,0,0,19,6,0,0,North/East
+USSQ_1,"Susquehanna River, Cooperstown, Co Rte 52, 1.2 mi blw Otsego L",4,Susquehanna,42.69194,-74.92778,Mid-Order,2,1,TEST,7/21/2004,0.2,10,19,220,8.2,7.5,46,78,50,0,23,0,23,0,17,37,0,Chesapeake
+SAMC_1,"Salmon Ck, East Road",1,Ontario,43.28632,-77.79139,Mid-Order,1,3,TEST,9/26/2002,0.2,15,19,830,8.2,8.3,25,53.7,20,0,100,0,0,0,0,0,0,Great Lakes
+ISCH_1,"Ischua, Maplecrest, abv Oil, 3",7,Allegheny,42.18005,-78.38503,Mississippi,1,3,TEST,5/3/2001,0.2,30,21,353,8,8.6,69,116.2,25,0,0,0,92,0,0,0,8,Mississippi
+ALGY_3,"Olean, Maplecrest, blw Oil, e",03A,Allegheny,42.12032,-78.41949,Mississippi,1,3,TEST,5/3/2001,0.3,50,22,407,7.8,6.9,68,198.5,70,0,37,0,40,0,23,0,0,Mississippi
+OIL_2,"Oil Ck,, N. Br. Rd",4,Allegheny,42.16981,-78.38743,Mississippi,1,3,TEST,2/8/2001,0.1,6,16,232,7.3,10.3,66,63.4,30,0,31,0,49,0,14,6,0,Mississippi
+MIL2_2,"Mill Ck, Sinclairville, gbps",1,Allegheny,42.25417,-79.26853,Mississippi,4,3,TEST,9/20/2001,0.2,15,14,177,7.7,10.6,64,20.4,20,0,63,0,17,0,6,0,14,Mississippi
+BRLO_2,"Bear Lake outlet, bbps, 2",2,Allegheny,42.301,-79.362,Mississippi,1,3,TEST,9/20/2001,0.1,4,15,411,7.3,5.2,60,20.4,70,0,0,0,13,0,0,88,0,Mississippi
+WANG_8,"L. Conewango, Randolpf",L,Allegheny,42.17361,-78.98639,Mississippi,1,3,TEST,7/21/2000,0.3,8,15,204,7.6,7.8,54,44.2,70,0,19,0,28,0,53,0,0,Mississippi
+CASS_4,"Cassadaga, Kabob",0,Allegheny,42.31195,-79.29892,Mississippi,1,3,TEST,5/16/2000,0.1,10,23,367,7.4,7.5,51,17.3,0,0,20,0,0,0,14,66,0,Mississippi
+FREN_1,"French Ck., blw White Hill Rd",4,Allegheny,42.02447,-79.74737,Mississippi,1,3,TEST,9/9/1999,0.2,15,24,463,8,9.4,51,82.7,20,0,9,0,81,0,9,0,0,Mississippi
+STIL_7,"Stillwater  Creek, Rte 62",1,Allegheny,42.05399,-79.19724,Mississippi,1,3,TEST,5/4/2001,0.1,8,16,332,7.5,9.4,51,56,40,0,21,0,53,0,26,0,0,Mississippi
+ELMC_2,"Elm Ck, Weeden Rd, gbps",1,Allegheny,42.16116,-78.96429,Mississippi,4,3,TEST,9/21/2001,0.1,6,14,150,7.6,9.9,49,18.4,50,0,31,0,6,0,64,0,0,Mississippi
+SLAB_4,"Slab City Ck, W. Clarksville,gbps",0,Allegheny,42.409,-79.037,Mississippi,1,3,TEST,9/20/2001,0.3,1.5,25,388,8.1,11,46,5.3,0,0,0,0,0,0,46,54,0,Mississippi

@@ -1,0 +1,63 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Metric Sensitivity
+
+To calculate metric sensitivity we will install the other package I 
+am developing, `mmi`. This package is also available on GitHub and can be 
+installed with `devtools::install_github("zsmith27/MMI", ref = "build")`.
+If you have difficulties installing the package please try running 
+`install.packages(c("devtools","curl", "httr"))` and then run 
+`devtools::install_github("zsmith27/MMI", ref = "build")` again. If 
+the issue persists, please contact me through my GitHub page.
+```{r, message=FALSE}
+library(MMI)
+```
+
+## State-Wide Index
+
+Metric sensitivity was calculated without splitting the data by basin or drainage area. 
+This spatial resolution would create a single index for New York State. 
+```{r}
+#table.df <- table(metrics.df$gradient) %>% 
+#  data.frame() %>% 
+  
+```
+
+```{r}
+sens.all <- MMI::sensitivity(metrics.df,
+                        first.metric = "pct_warm_water",
+                        condition.colname = "gradient",
+                        ref.cond = "reference",
+                        deg.cond = "degraded",
+                        method = "ALL") %>% 
+  dplyr::rename_all(tolower) %>% 
+  dplyr::arrange(desc(de_sensitivity))
+```
+
+### State-Wide Metric Sensitivity
+
+The table shows a portion of the output from `MMI` function `sensitivity`. 
+
+* `disturbance` =
+    + "INCREASE" if the metric increases with disturbance
+    + "DECREASE" if the metric decreases with disturbance
+    + "EQUAL" if there is no change due to disturbance
+* `barbour_sensitivity` = the barbour visual method was automated.
+    + 0 = Overlap of the reference median with the degraded IQR and overlap of the degraded median with the reference IQR
+    + 1 = Overlap of either one distributions median with the other distributions IQR
+    + 2 = Overlap of the reference IQR with the degraded IQR but no overlap of median values
+    + 3 = No overlap of the IQR of reference and degraded distributions
+* `de_sensitivity` = Discrimination Efficiency (DE) is the most popular method for calculating metric sensitivity. For metrics that decrease with disturbance, DE is the percentage of degraded samples correctly identified below the reference 25th percentile. For metrics that increase with disturbance, DE is the percentage of degraded samples correctly identified above the reference 75th percentile. 100 is the best possible value and 0 is the worst. Typically, values greater than or equal to 75 are considered good.
+* `bde_sensitivity` = Balanced Discrimination Efficiency (BDE) is a measure that I have been working on with my boss Claire Buchannan. The standard DE method is kind of arbitrary. Our method tests every reference percentile as a potential threshold for splitting reference and degraded distributions. DE only tests the reference 25th or 75th percentile as a splitting point.  We also aim to balance the number of reference correctly identified with the threshold with the number of degraded correctly identified.  I think this method is great but it is still in development; therefore, it is probably safer to just stick with Barbour et al.'s (1996) method and the DE method.
+
+Each table represents only the top 10 performing metrics.
+```{r}
+sens.all %>% 
+  dplyr::arrange(desc(de_sensitivity)) %>% 
+  dplyr::select(1:6) %>% 
+  dplyr::slice(1:10) %>% 
+  DT::datatable(options = list(dom = 't'))
+```

@@ -1,0 +1,110 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Metric Calculation
+
+Metrics are calculated using the `Benthos` package that I am developing.
+
+## Sequence Metrics
+
+The `Benthos` function `seq_taxa` allows the user to sequence across a 
+specified vector of column names and calculate the percentage, abundance, 
+or richness of each taxon in the specified columns. The vector of column 
+names currently being used is `hier.vec`. You will notice that this vector 
+does not just include taxonomic columns, but also, taxonomic attribute columns. 
+Each taxonomic attribute is treated like a unique taxon, and therefore, the 
+percentage, abundance, and richness of each taxonomic attribute can also be 
+calculated. The `seq_taxa` function can only do one `job` at a time. The `dplyr` 
+function `bind_cols` is used to append columns together from each `seq_taxa` call. 
+Each metric calculated with the `seq_taxa` function will be named with a prefix 
+designated to the specified `job` ("pct" = percentage, "abund" = abundance, and 
+"rich" = richness) followed by the taxonomic name or taxonomic attribute name.
+
+```{r, message=FALSE}
+hier.vec <- c("water_type", "tolerance", "native", "trophic_class",
+              "class", "superorder", "order", "suborder", "superfamily",
+              "family", "subfamily", "tribe", "genus", "species")
+
+seq.df <- Benthos::seq_taxa(fish.long, site, count, hier.vec, job = "pct") %>% 
+  dplyr::bind_cols(Benthos::seq_taxa(fish.long, site, count, hier.vec, job = "abund")) %>% 
+  dplyr::bind_cols(Benthos::seq_taxa(fish.long, site, count, hier.vec[!hier.vec %in% "species"],
+                     high.taxa.col = "species", job = "rich"))
+```
+
+## Additional Metrics
+
+Create a new data frame to store metric values. Keep only the columns 
+that will be useful in subsequent analyses.
+```{r}
+metrics.df <- fish.long %>% 
+  select(site, gradient, basin, drainage_size) %>% 
+  distinct()
+```
+
+The `seq_taxa` function cannot be used to calculate all metrics. Below 
+total species richness, weighted species richness, total abundance, and 
+the percent of dominant taxa (1, 2, 3, 4, and 5). `pct_`, `abund_`, and 
+`rich_` `insectivores` was calculated as the sum of the corresponding 
+`benthic_insectivore`, `water_column_insectivore`, and `pi` metrics calculated 
+with `seq_taxa`.
+```{r}
+#==============================================================================
+metrics.df <- dplyr::bind_cols(metrics.df, seq.df)
+
+metrics.df <- metrics.df %>% 
+  mutate(richness = taxa_rich(fish.long, site, count, family, species)) %>% 
+  left_join(env.df[, c("site", "width")], by = "site") %>% 
+#  mutate(weighted_richness =
+#           case_when(
+#             width <= 4 ~ richness + 2,
+#             width > 4 & width <= 9 ~ as.double(richness),
+#             width > 9 & width <= 19 ~ richness - 2,
+#             width > 19 ~ richness - 4,
+#             is.na(width) ~ as.numeric(NA),
+#             TRUE ~ as.numeric(NA)
+#           )) %>% 
+  select(-width) %>% 
+  mutate(abundance = taxa_abund(fish.long, site, count, species),
+         shannon = taxa_div(fish.long, site, count, species, job = "shannon", base = 2),
+         simpson = taxa_div(fish.long, site, count, species, job = "simpson"),
+         hill_2 = taxa_div(fish.long, site, count, species, job = "hill", q = 2),
+         pct_dom1 = pct_dom(fish.long,
+                        unique.id.col = site,
+                        count.col = count,
+                        taxa.col = species,
+                        dom.level = 1),
+         pct_dom2 = pct_dom(fish.long,
+                        unique.id.col = site,
+                        count.col = count,
+                        taxa.col = species,
+                        dom.level = 2),
+         pct_dom3 = pct_dom(fish.long,
+                        unique.id.col = site,
+                        count.col = count,
+                        taxa.col = species,
+                        dom.level = 3),
+         pct_dom4 = pct_dom(fish.long,
+                        unique.id.col = site,
+                        count.col = count,
+                        taxa.col = species,
+                        dom.level = 4),
+         pct_dom5 = pct_dom(fish.long,
+                        unique.id.col = site,
+                        count.col = count,
+                        taxa.col = species,
+                        dom.level = 5),
+         pct_insectivores = sum(pct_benthic_insectivore,
+                                pct_water_column_insectivore,
+                                pct_pi),
+         abund_insectivores = sum(abund_benthic_insectivore,
+                                abund_water_column_insectivore,
+                                abund_pi),
+         rich_insectivores = sum(rich_benthic_insectivore,
+                                rich_water_column_insectivore,
+                                rich_pi))
+```
+
+
+`r ncol(metrics.df) - 4` metrics were calculated.
